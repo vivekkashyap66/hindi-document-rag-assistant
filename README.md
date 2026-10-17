@@ -139,6 +139,93 @@ python -m pip --version
 
 ## Running the Project
 
-Run the following commands from the repository root with the virtual environment activated.
+Run the following commands from the project root directory with the virtual environment activated.
 
-### Step 1: Process
+### 1. Process the PDF
+
+```powershell
+python -m src.ingest
+```
+
+This runs the document ingestion module to process the source document and prepare its text for retrieval.
+
+### 2. Run the Evaluation Queries
+
+```powershell
+python -m tests.test_queries
+```
+
+This executes the six assignment evaluation questions and saves the results to `outputs/results.md`.
+
+### 3. Run the Unit Tests
+
+```powershell
+python -m unittest discover -s tests -p "test_*.py" -v
+```
+
+The current unit test suite contains three tests covering selected answer-generation behaviors.
+
+## Evaluation Questions
+
+1. Which satellite did SLV-III place into orbit, and in which year?
+2. In which year did Dr. A. P. J. Abdul Kalam receive the Bharat Ratna?
+3. What was Kalam's role in the Pokhran-II nuclear tests?
+4. Which institution did Kalam attend to study aeronautical engineering?
+5. Who co-authored *Wings of Fire*, and in which year was it published?
+6. How and where did Kalam die in 2015?
+
+## Evaluation Results
+
+| No. | Topic | Result |
+|---|---|---|
+| 1 | SLV-III mission | Rohini satellite, 1980 |
+| 2 | Bharat Ratna | 1997 |
+| 3 | Pokhran-II | Kalam played a central organizational role as Scientific Adviser to the Defence Minister and head of DRDO. |
+| 4 | Aeronautical engineering | Madras Institute of Technology (MIT), Chennai |
+| 5 | *Wings of Fire* | Co-authored with Arun Tiwari; published in 1999 |
+| 6 | Death of Dr. Kalam | 27 July 2015, at IIM Shillong, while delivering a lecture |
+
+Detailed answers and supporting evidence are available in [`outputs/results.md`](outputs/results.md).
+
+## Testing
+
+The latest reported unit test run completed successfully:
+
+```text
+Ran 3 tests
+OK
+```
+
+The six-question evaluation is a separate test from the unit test suite.
+
+## Design Notes and Limitations
+
+- Answers depend on the extracted PDF text and retrieved passages.
+- Citation quality depends on retrieval relevance.
+- The current implementation includes question-specific answer handling for some evaluation questions.
+- The three unit tests do not provide exhaustive coverage of the entire pipeline.
+
+## Future Improvements
+
+- Improve Hindi text retrieval.
+- Tune chunk size and overlap.
+- Improve citation ranking.
+- Add tests for ingestion and retrieval.
+- Evaluate more questions, including questions without supporting evidence.
+
+## Conclusion
+
+This project demonstrates a document-based question-answering workflow over a Hindi PDF, combining document ingestion, semantic retrieval, evidence-based answers, citations, and evaluation.
+
+## Author
+
+**Katta Vivekavardhan Kashyap**
+
+GitHub: [vivekkashyap66](https://github.com/vivekkashyap66)
+
+[View the project repository](https://github.com/vivekkashyap66/hindi-document-rag-assistant)
+
+---
+
+*Developed as part of the MegaMindz AI Solutions Level 1 Internship Assignment.*
+
