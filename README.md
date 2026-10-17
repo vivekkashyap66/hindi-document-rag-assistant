@@ -1,159 +1,149 @@
 # Hindi Document RAG Assistant — MegaMindz Level 1
 
-A small, local Retrieval-Augmented Generation (RAG) pipeline for the supplied Hindi study guide about A. P. J. Abdul Kalam. It supports Hindi and English questions, indexes passages in ChromaDB, and returns answers with page, section, chunk ID, and retrieval score citations.
+A local Retrieval-Augmented Generation (RAG) pipeline for the supplied Hindi study guide about A. P. J. Abdul Kalam. The application supports Hindi and English queries, indexes document passages in ChromaDB, and returns evidence-backed answers with source citations, including PDF page number, section, chunk ID, and retrieval score.
 
 ## Features
 
-- PDF text extraction with PyMuPDF, preserving physical PDF page numbers.
-- Unicode NFC normalization and whitespace cleanup without stripping Devanagari marks or danda (`।`).
-- Sentence/paragraph-aware chunking with overlap.
-- Multilingual `intfloat/multilingual-e5-small` embeddings.
-- Persistent local ChromaDB vector storage.
-- English-to-Hindi cross-lingual retrieval.
-- Evidence snippets and automatic metadata citations.
-- No paid API key required: the default answer mode selects evidence sentences from retrieved passages. This is an extractive fallback, not an LLM-generated response.
-- Six required assignment questions are run by `tests/test_queries.py`.
+- **PDF processing:** Extracts text from PDF pages using PyMuPDF.
+- **Hindi text handling:** Applies Unicode NFC normalization and whitespace cleanup while preserving Devanagari marks and danda (`।`).
+- **Chunking:** Splits text into manageable passages using paragraph and sentence boundaries with overlap.
+- **Multilingual embeddings:** Uses `intfloat/multilingual-e5-small` for Hindi and English retrieval.
+- **Vector database:** Stores embeddings and metadata in a persistent local ChromaDB collection.
+- **Cross-lingual retrieval:** Supports English questions over Hindi source content.
+- **Evidence and citations:** Returns retrieved evidence snippets with page, section, chunk ID, and retrieval score.
+- **Local execution:** Does not require a paid LLM API key.
+- **Extractive answering:** Uses a lightweight evidence-based answer function rather than an LLM-generated response.
+- **Evaluation:** Provides a script to run the six mandatory assignment queries and save their outputs.
 
-## Project structure
+## Project Structure
 
 ```text
-data/
-  Agni_Ki_Udaan_Adhyayan_Sahayika_Hindi.pdf
-  chroma_db/                 # created by ingestion
-src/
-  config.py
-  ingest.py
-  retriever.py
-  answer.py
-tests/
-  test_queries.py
-outputs/
-  results.md                 # generated test output
-requirements.txt
+hindi-document-rag-assistant/
+├── data/
+│   └── Agni_Ki_Udaan_Adhyayan_Sahayika_Hindi.pdf
+├── outputs/
+│   ├── .gitkeep
+│   └── results.md
+├── src/
+│   ├── __init__.py
+│   ├── config.py
+│   ├── ingest.py
+│   ├── retriever.py
+│   └── answer.py
+├── tests/
+│   ├── __init__.py
+│   ├── test_answer.py
+│   └── test_queries.py
+├── .gitignore
+├── README.md
+└── requirements.txt
 ```
+
+The `data/chroma_db/` directory is created when ingestion runs. It is excluded from Git because the vector index can be regenerated from the supplied PDF.
 
 ## Requirements
 
 - Python 3.10 or 3.11 recommended.
-- Internet connection on the first run to install dependencies and download the embedding model.
-- A few GB of free disk space is recommended for Python packages and the model cache.
+- Internet access for installing dependencies and downloading the embedding model on the first run.
+- Sufficient disk space for Python dependencies, the model cache, and the generated vector index.
 - No paid LLM API key is required.
 
-## Windows + VS Code setup
+## Windows Setup Using VS Code
 
-Open this project folder in VS Code. Open **Terminal → New Terminal** (PowerShell).
+Open the project folder in VS Code and select **Terminal → New Terminal**. The commands below assume PowerShell and that the terminal is in the project root.
 
 ### 1. Check Python
 
 ```powershell
 py --version
+py -0p
 ```
 
-If this says the command is not recognized, install Python 3.11 from https://www.python.org/downloads/ and select **Add python.exe to PATH** during installation. Restart VS Code and check again.
+If Python is not installed, install Python 3.11 from [python.org](https://www.python.org/downloads/). Ensure Python is available through the Python launcher.
 
-### 2. Create and activate a virtual environment
+### 2. Create and Activate a Virtual Environment
 
 ```powershell
 py -3.11 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 ```
 
-If PowerShell blocks activation, use this for the current terminal session only:
+If PowerShell blocks activation, allow it for the current terminal session only:
 
 ```powershell
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 .\.venv\Scripts\Activate.ps1
 ```
 
-Alternative without activation:
+Alternatively, run Python directly from the virtual environment without activating it:
 
 ```powershell
 .\.venv\Scripts\python.exe -m pip install --upgrade pip
 ```
 
-### 3. Install dependencies
+### 3. Install Dependencies
+
+With the virtual environment activated, run:
 
 ```powershell
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
-### 4. Add the supplied PDF
+### 4. Verify the Dataset
 
-Copy `Agni_Ki_Udaan_Adhyayan_Sahayika_Hindi.pdf` into the `data` folder. The expected exact path is:
+Ensure the supplied PDF is located at:
 
 ```text
-data\Agni_Ki_Udaan_Adhyayan_Sahayika_Hindi.pdf
+data/Agni_Ki_Udaan_Adhyayan_Sahayika_Hindi.pdf
 ```
 
-### 5. Build the index
+The PDF is included in the repository. If setting up the project from a different location, copy the supplied document into the `data` directory using the exact filename expected by the application.
 
-Run from the project root:
+### 5. Build the Vector Index
+
+Run this command from the project root:
 
 ```powershell
 python -m src.ingest
 ```
 
-This extracts text, creates chunks, downloads/loads the multilingual embedding model, and writes the ChromaDB index to `data/chroma_db/`. Re-running ingestion rebuilds the collection to avoid duplicate chunks.
+The ingestion process extracts the PDF text, normalizes it, creates chunks, generates multilingual embeddings, and stores the indexed passages in `data/chroma_db/`.
 
-### 6. Ask a question
+Re-run ingestion if the source document or chunking configuration changes.
+
+### 6. Ask Questions
+
+Hindi example:
 
 ```powershell
 python -m src.answer "कलाम को भारत रत्न किस वर्ष प्राप्त हुआ?"
+```
+
+English example:
+
+```powershell
 python -m src.answer "Which institution did Kalam attend to study aeronautical engineering?"
 ```
 
-Append an answer to a log:
+To save an answer to a separate output file, if supported by the current command-line implementation:
 
 ```powershell
 python -m src.answer "How and where did Kalam die in 2015?" --output outputs\manual_queries.md
 ```
 
-### 7. Run the six required test queries
+### 7. Run the Six Mandatory Assignment Queries
+
+Execute the evaluation script:
 
 ```powershell
 python -m tests.test_queries
 ```
 
-Review `outputs/results.md`. Do not submit it without checking that each answer is supported by the cited evidence and that English questions retrieve the correct Hindi passages.
+The script runs the six required questions through the retrieval and answering pipeline and saves the formatted output to:
 
-## Design choices
+```text
+outputs/results.md
+```
 
-### Chunking
-
-The initial target is 900 characters with 120 characters of overlap. Hindi paragraphs and sentence punctuation (`।`, `.`, `!`, `?`) are respected where possible. Longer units are split as a fallback. The values are starting points; inspect retrieval results and tune if necessary. Chunk IDs are deterministic for the same page, section, order, and content.
-
-### Vector database
-
-ChromaDB was selected because it is open-source, simple to run locally, and supports persistent collections, document metadata, and vector similarity queries without a separate server.
-
-### Hindi handling and embeddings
-
-Text is normalized with Unicode NFC; whitespace is cleaned but Devanagari combining marks and danda are preserved. The multilingual E5 model is used for both Hindi passages and Hindi/English queries. E5's `passage:` and `query:` prefixes are applied as recommended by the model family. Physical PDF page numbers are stored as 1-based metadata. Section labels are inferred from numbered headings at the start of pages; verify these labels in the output because headings that wrap across lines may need refinement.
-
-### Citations
-
-Citations are populated from retrieved ChromaDB metadata at answer time, not manually assigned. Chroma returns cosine distance because the collection is configured with cosine space; the script reports `1 - distance` as a similarity-like score. Treat it as a retrieval score, not a calibrated probability.
-
-### Answer generation and limitations
-
-The default answer function is an extractive, evidence-first fallback so the project runs without a paid LLM key. It is not a generative LLM. Sentence selection is intentionally simple and may need improvement for complex questions. If an accessible local or hosted LLM is later added, pass only retrieved context to it, require it to abstain when evidence is missing, and retain the same citations.
-
-PDF table extraction quality depends on how the PDF encodes text. If rows are fragmented, add a dedicated table extraction/repair step and validate the timeline and awards sections. Retrieval quality should be assessed empirically using the six supplied queries.
-
-## Troubleshooting
-
-- **PDF not found:** check the exact filename and `data` path.
-- **PowerShell activation error:** use the process-scoped execution policy command above, or call `.venv\Scripts\python.exe` directly.
-- **Model download fails:** check internet access and disk space; retry after connectivity is restored.
-- **No collection found:** run `python -m src.ingest` before asking questions.
-- **Poor English-to-Hindi retrieval:** inspect top-k evidence; try `TOP_K = 5` or tune chunk size/overlap. Do not hardcode answers to the required questions.
-
-## Submission checklist
-
-- [ ] Ingestion and question answering run end to end.
-- [ ] Six-query output is generated from the actual pipeline.
-- [ ] Every answer has page, section, chunk ID, and score.
-- [ ] English questions retrieve relevant Hindi passages.
-- [ ] `requirements.txt` and this README are included.
-- [ ] No secrets or virtual environment are committed.
+Review the generated file to confirm that each answer is supported by the retrieved evidence and that the source
