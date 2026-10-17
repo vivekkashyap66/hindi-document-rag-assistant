@@ -1,19 +1,41 @@
-# Hindi Document RAG Assistant — MegaMindz Level 1
+# Hindi Document RAG Assistant
 
-A local Retrieval-Augmented Generation (RAG) pipeline for the supplied Hindi study guide about A. P. J. Abdul Kalam. The application supports Hindi and English queries, indexes document passages in ChromaDB, and returns evidence-backed answers with source citations, including PDF page number, section, chunk ID, and retrieval score.
+A local Retrieval-Augmented Generation (RAG) assistant built to answer questions from the Hindi PDF *Agni Ki Udaan Adhyayan Sahayika*, a study guide about Dr. A. P. J. Abdul Kalam.
+
+The system extracts text from the PDF, divides it into chunks, retrieves relevant passages for a question, and generates an answer grounded in the retrieved document content.
+
+## Project Overview
+
+This project was developed as part of the **MegaMindz AI Solutions – Level 1 Internship Assignment**.
+
+### Objectives
+
+- Build a document-based question-answering system.
+- Extract and process text from a Hindi PDF.
+- Retrieve relevant document chunks for user queries.
+- Generate answers supported by retrieved evidence.
+- Evaluate the system using the six mandatory assignment questions.
+- Provide source citations to help verify answers.
 
 ## Features
 
-- **PDF processing:** Extracts text from PDF pages using PyMuPDF.
-- **Hindi text handling:** Applies Unicode NFC normalization and whitespace cleanup while preserving Devanagari marks and danda (`।`).
-- **Chunking:** Splits text into manageable passages using paragraph and sentence boundaries with overlap.
-- **Multilingual embeddings:** Uses `intfloat/multilingual-e5-small` for Hindi and English retrieval.
-- **Vector database:** Stores embeddings and metadata in a persistent local ChromaDB collection.
-- **Cross-lingual retrieval:** Supports English questions over Hindi source content.
-- **Evidence and citations:** Returns retrieved evidence snippets with page, section, chunk ID, and retrieval score.
-- **Local execution:** Does not require a paid LLM API key.
-- **Extractive answering:** Uses a lightweight evidence-based answer function rather than an LLM-generated response.
-- **Evaluation:** Provides a script to run the six mandatory assignment queries and save their outputs.
+- **PDF ingestion:** Extracts text from the supplied Hindi PDF.
+- **Text chunking:** Divides extracted text into manageable chunks.
+- **Semantic retrieval:** Retrieves relevant passages for each question.
+- **Evidence-based answering:** Uses retrieved document content to formulate answers.
+- **Source citations:** Includes page references and chunk identifiers where available.
+- **Evaluation:** Runs the six mandatory assignment questions.
+- **Unit tests:** Tests selected answer-generation behaviors.
+
+## Technology Stack
+
+- Python 3.10+
+- PDF text extraction
+- Text chunking and semantic retrieval
+- Embeddings and vector-based similarity search
+- Python `unittest` for testing
+
+The exact libraries and model configuration are defined in `requirements.txt` and `src/config.py`.
 
 ## Project Structure
 
@@ -31,7 +53,6 @@ hindi-document-rag-assistant/
 │   ├── retriever.py
 │   └── answer.py
 ├── tests/
-│   ├── __init__.py
 │   ├── test_answer.py
 │   └── test_queries.py
 ├── .gitignore
@@ -39,111 +60,75 @@ hindi-document-rag-assistant/
 └── requirements.txt
 ```
 
-The `data/chroma_db/` directory is created when ingestion runs. It is excluded from Git because the vector index can be regenerated from the supplied PDF.
-
 ## Requirements
 
-- Python 3.10 or 3.11 recommended.
-- Internet access for installing dependencies and downloading the embedding model on the first run.
-- Sufficient disk space for Python dependencies, the model cache, and the generated vector index.
-- No paid LLM API key is required.
+- Python 3.10 or a compatible newer version
+- Git
+- Visual Studio Code or another Python-compatible editor
+- Internet access for installing dependencies and downloading any required models
 
-## Windows Setup Using VS Code
+## Setup and Installation on Windows
 
-Open the project folder in VS Code and select **Terminal → New Terminal**. The commands below assume PowerShell and that the terminal is in the project root.
+### 1. Clone the repository
 
-### 1. Check Python
+Open PowerShell or the VS Code terminal and run:
 
 ```powershell
-py --version
-py -0p
+git clone https://github.com/vivekkashyap66/hindi-document-rag-assistant.git
+cd hindi-document-rag-assistant
 ```
 
-If Python is not installed, install Python 3.11 from [python.org](https://www.python.org/downloads/). Ensure Python is available through the Python launcher.
+### 2. Create a virtual environment
 
-### 2. Create and Activate a Virtual Environment
+If Python 3.10 is installed:
 
 ```powershell
-py -3.11 -m venv .venv
+py -3.10 -m venv .venv
+```
+
+Alternatively, use another compatible Python version installed on your system:
+
+```powershell
+py -m venv .venv
+```
+
+### 3. Activate the virtual environment
+
+```powershell
 .\.venv\Scripts\Activate.ps1
 ```
 
-If PowerShell blocks activation, allow it for the current terminal session only:
+If PowerShell blocks script execution, run this command in the current terminal session:
 
 ```powershell
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+```
+
+Then activate the environment again:
+
+```powershell
 .\.venv\Scripts\Activate.ps1
 ```
 
-Alternatively, run Python directly from the virtual environment without activating it:
+### 4. Install dependencies
 
-```powershell
-.\.venv\Scripts\python.exe -m pip install --upgrade pip
-```
-
-### 3. Install Dependencies
-
-With the virtual environment activated, run:
+Upgrade pip:
 
 ```powershell
 python -m pip install --upgrade pip
+```
+
+Install the project dependencies:
+
+```powershell
 python -m pip install -r requirements.txt
 ```
 
-### 4. Verify the Dataset
-
-Ensure the supplied PDF is located at:
-
-```text
-data/Agni_Ki_Udaan_Adhyayan_Sahayika_Hindi.pdf
-```
-
-The PDF is included in the repository. If setting up the project from a different location, copy the supplied document into the `data` directory using the exact filename expected by the application.
-
-### 5. Build the Vector Index
-
-Run this command from the project root:
+### 5. Verify the Python installation
 
 ```powershell
-python -m src.ingest
+python --version
+python -m pip --version
 ```
 
-The ingestion process extracts the PDF text, normalizes it, creates chunks, generates multilingual embeddings, and stores the indexed passages in `data/chroma_db/`.
-
-Re-run ingestion if the source document or chunking configuration changes.
-
-### 6. Ask Questions
-
-Hindi example:
-
-```powershell
-python -m src.answer "कलाम को भारत रत्न किस वर्ष प्राप्त हुआ?"
-```
-
-English example:
-
-```powershell
-python -m src.answer "Which institution did Kalam attend to study aeronautical engineering?"
-```
-
-To save an answer to a separate output file, if supported by the current command-line implementation:
-
-```powershell
-python -m src.answer "How and where did Kalam die in 2015?" --output outputs\manual_queries.md
-```
-
-### 7. Run the Six Mandatory Assignment Queries
-
-Execute the evaluation script:
-
-```powershell
-python -m tests.test_queries
-```
-
-The script runs the six required questions through the retrieval and answering pipeline and saves the formatted output to:
-
-```text
-outputs/results.md
-```
-
-Review the generated file to confirm that each answer is supported by the retrieved evidence and that the source
+## Running the Project
