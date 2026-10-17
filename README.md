@@ -1,8 +1,8 @@
 # Hindi Document RAG Assistant
 
-A local Retrieval-Augmented Generation (RAG) assistant built to answer questions from the Hindi PDF *Agni Ki Udaan Adhyayan Sahayika*, a study guide about Dr. A. P. J. Abdul Kalam.
+A local Retrieval-Augmented Generation (RAG) assistant designed to answer questions from the Hindi PDF *Agni Ki Udaan Adhyayan Sahayika*, a study guide about Dr. A. P. J. Abdul Kalam.
 
-The system extracts text from the PDF, divides it into chunks, retrieves relevant passages for a question, and generates an answer grounded in the retrieved document content.
+The system extracts text from the PDF, divides it into chunks, retrieves relevant passages for a question, and generates an answer supported by the retrieved document content.
 
 ## Project Overview
 
@@ -25,17 +25,19 @@ This project was developed as part of the **MegaMindz AI Solutions – Level 1 I
 - **Evidence-based answering:** Uses retrieved document content to formulate answers.
 - **Source citations:** Includes page references and chunk identifiers where available.
 - **Evaluation:** Runs the six mandatory assignment questions.
-- **Unit tests:** Tests selected answer-generation behaviors.
+- **Unit testing:** Tests selected answer-generation behaviors.
+- **Evaluation report:** Saves answers and supporting evidence in `outputs/results.md`.
 
 ## Technology Stack
 
 - Python 3.10+
 - PDF text extraction
-- Text chunking and semantic retrieval
-- Embeddings and vector-based similarity search
+- Text chunking
+- Embeddings and semantic retrieval
+- Vector-based similarity search
 - Python `unittest` for testing
 
-The exact libraries and model configuration are defined in `requirements.txt` and `src/config.py`.
+The exact dependencies, embedding configuration, and model settings are defined in `requirements.txt` and `src/config.py`.
 
 ## Project Structure
 
@@ -62,14 +64,16 @@ hindi-document-rag-assistant/
 
 ## Requirements
 
+Before running the project, ensure you have:
+
 - Python 3.10 or a compatible newer version
 - Git
 - Visual Studio Code or another Python-compatible editor
-- Internet access for installing dependencies and downloading any required models
+- Internet access for installing dependencies and downloading required models
 
 ## Setup and Installation on Windows
 
-### 1. Clone the repository
+### Step 1: Clone the Repository
 
 Open PowerShell or the VS Code terminal and run:
 
@@ -78,27 +82,29 @@ git clone https://github.com/vivekkashyap66/hindi-document-rag-assistant.git
 cd hindi-document-rag-assistant
 ```
 
-### 2. Create a virtual environment
+If you have already cloned the repository, navigate to your existing project directory instead.
 
-If Python 3.10 is installed:
+### Step 2: Create a Virtual Environment
+
+For Python 3.10:
 
 ```powershell
 py -3.10 -m venv .venv
 ```
 
-Alternatively, use another compatible Python version installed on your system:
+Alternatively, create the environment using your default Python installation:
 
 ```powershell
 py -m venv .venv
 ```
 
-### 3. Activate the virtual environment
+### Step 3: Activate the Virtual Environment
 
 ```powershell
 .\.venv\Scripts\Activate.ps1
 ```
 
-If PowerShell blocks script execution, run this command in the current terminal session:
+If PowerShell blocks script execution, run the following command in the current terminal session:
 
 ```powershell
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
@@ -110,7 +116,7 @@ Then activate the environment again:
 .\.venv\Scripts\Activate.ps1
 ```
 
-### 4. Install dependencies
+### Step 4: Install Dependencies
 
 Upgrade pip:
 
@@ -124,7 +130,7 @@ Install the project dependencies:
 python -m pip install -r requirements.txt
 ```
 
-### 5. Verify the Python installation
+### Step 5: Verify the Installation
 
 ```powershell
 python --version
@@ -132,3 +138,7 @@ python -m pip --version
 ```
 
 ## Running the Project
+
+Run the following commands from the repository root with the virtual environment activated.
+
+### Step 1: Process
